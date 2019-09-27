@@ -1,0 +1,84 @@
+ <resources>
+    <string name="app_name">Carcheque</string>
+    <string name="error_message_error">Error, los datos ingresados no coinciden</string>
+    <string-array name="materiales_string">
+        <item>SELECCIONE MATERIAL</item>
+        <item>BASE 1"</item>
+        <item>BASE 1 1/4"</item>
+        <item>BASE 1 1/2"</item>
+        <item>TERRAPLEN 4"</item>
+        <item>TERRAPLEN 6"</item>
+        <item>INTEGRAL</item>
+        <item>ARCILLA</item>
+    </string-array>
+
+    <string-array name="plantas_string">
+        <item>SELECCIONE PLANTA</item>
+        <item>SANTA ANA DE QUERI</item>
+        <item>GASTON YANEZ</item>
+        <item>SAUZAL</item>
+        <item>BUENA FE</item>
+        <item>LAS ARAUCARIAS</item>
+        <item>EL PEUMO</item>
+        <item>MAGGI</item>
+        <item>POZO LA MINA</item>
+        <item>POZO HUAQUEN</item>
+        <item>LA BALSA</item>
+    </string-array>
+
+     <string-array name="plantas_paredones">
+         <item>SELECCIONE PLANTA</item>
+         <item>LA CAPILLA</item>
+     </string-array>
+
+     <string-array name="plantas_rincon_lobos">
+         <item>SELECCIONE PLANTA</item>
+         <item>SANTA ANA DE QUERI</item>
+         <item>EL PEUMO</item>
+         <item>LA BALSA</item>
+         <item>GASTON YANEZ</item>
+     </string-array>
+
+     <string-array name="plantas_especifica_pencahue">
+         <item>SELECCIONE PLANTA</item>
+         <item>MAGGI</item>
+         <item>POZO LA MINA</item>
+         <item>POZO HUAQUEN</item>
+     </string-array>
+
+    <string-array name="obras_string">
+        <item>RINCON DE LOBOS</item>
+        <item>K-25</item>
+        <item>HUENCUECHO</item>
+        <item>CURICO SUR</item>
+        <item>PAREDONES</item>
+        <item>TALCA NORTE</item>
+        <item>PENCAHUE</item>
+    </string-array>
+
+     <string-array name="caminos_pencahue">
+         <item>K420</item>
+         <item>K260</item>
+         <item>SK279</item>
+         <item>K540</item>
+     </string-array>
+
+    <string-array name="caminos_l11_string">
+        <item>SELECCIONE CAMINO</item>
+        <item>ESTACION VILLA ALEGRE (L131)</item>
+        <item>RINCON DE LOBOS (L180)</item>
+        <item>LA ESPERANZA (L195)</item>
+    </string-array>
+
+    <string-array name="caminos_talcanorte">
+        <item>SELECCIONE CAMINO</item>
+        <item>SANTA ROSA (SK470)</item>
+    </string-array>
+
+     <string-array name="caminos_paredones">
+         <item>SELECCIONE CAMINO</item>
+         <item>RUTA I-510</item>
+         <item>RUTA I-528</item>
+         <item>RUTA I-540</item>
+     </string-array>
+</resources>
