@@ -59,14 +59,21 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String USUARIO_RECEPCION_MATERIAL = "usuario";
     public static final String ESTADO_RECEPCION_MATERIAL = "estado";
 
+    public static final String ID_CAMINOS = "id";
+    public static final String OBRA_CAMINOS = "obra";
+    public static final String NOMBRE_CAMINOS = "nombre";
+    public static final String DESDE_CAMINOS = "desde";
+    public static final String HASTA_CAMINOS = "hasta";
+
     final String CREAR_TABLA_USUARIOS = "CREATE TABLE usuarios (id INTEGER PRIMARY KEY AUTOINCREMENT,log_id TEXT unique, nombre TEXT, apellido TEXT, username TEXT, password TEXT, estado TEXT, unegocio TEXT)";
-    final String CREAR_TABLA_LISTADO_PLANTAS = "CREATE TABLE plantas (id TEXT unique, nombre TEXT, ubicacion TEXT)";
+    final String CREAR_TABLA_LISTADO_PLANTAS = "CREATE TABLE plantas (id TEXT unique, nombre TEXT, obra TEXT)";
     final String CREAR_TABLA_VEHICULOS = "CREATE TABLE vehiculos (id TEXT unique, patente TEXT unique, estado TEXT, propietario TEXT, marca TEXT, m3 TEXT)";
     final String CREAR_TABLA_RECEPCION = "CREATE TABLE recepcion (id INTEGER PRIMARY KEY AUTOINCREMENT, planta TEXT, tipomaterial TEXT, patente TEXT, m3 TEXT, km TEXT, obra TEXT, camino TEXT, fecha TEXT, hora TEXT, usuario TEXT, chofer TEXT, estado TEXT)";
     final String CREAR_TABLA_CHOFERES = "CREATE TABLE choferes (id TEXT unique, nombre TEXT, apellido TEXT)";
+    final String CREAR_TABLA_CAMINOS = "CREATE TABLE caminos (id TEXT unique, obra TEXT, nombre TEXT, desde TEXT, hasta TEXT)";
 
     public DatabaseHelper(Context context){
-        super(context, DATABASE_NAME,null,7);
+        super(context, DATABASE_NAME,null,11);
     }
 
     @Override
@@ -76,14 +83,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL(CREAR_TABLA_VEHICULOS);
         db.execSQL(CREAR_TABLA_RECEPCION);
         db.execSQL(CREAR_TABLA_CHOFERES);
+        db.execSQL(CREAR_TABLA_CAMINOS);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        db.execSQL("DROP TABLE IF EXISTS usuarios");
+        db.execSQL("DROP TABLE IF EXISTS caminos");
+        db.execSQL("DROP TABLE IF EXISTS plantas");
+        db.execSQL(CREAR_TABLA_CAMINOS);
+        db.execSQL(CREAR_TABLA_LISTADO_PLANTAS);
 
-
-        db.execSQL(CREAR_TABLA_USUARIOS);
     }
 
 
@@ -221,6 +230,25 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return vh;
     }
 
+    public boolean ExistePlanta(String id){
+        boolean PlantaExiste = false;
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = db.rawQuery("SELECT nombre FROM plantas WHERE id = '"+id+"'",null);        try {
+
+            if (cursor.getCount()<=0){
+
+                PlantaExiste = false;
+            }else{
+
+                PlantaExiste = true;
+            }
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return PlantaExiste;
+    }
 
     public boolean ExisteVehiculo(String id){
         boolean VehiculoExiste = false;
@@ -266,6 +294,50 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
     }
 
+
+    public boolean Registroplantas(String id, String nombre, String obra){
+
+        try {
+
+            SQLiteDatabase db = this.getWritableDatabase();
+
+            ContentValues contentValues = new ContentValues();
+
+            contentValues.put("ID", id );
+            contentValues.put("OBRA",obra);
+            contentValues.put("NOMBRE",nombre);
+
+            db.insert("plantas",null,contentValues);
+            db.close();
+            return true;
+        }catch (Exception e){
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+
+    public boolean RegistroCaminos(String id, String obra, String nombre, String desde, String hasta){
+        try {
+            SQLiteDatabase db = this.getWritableDatabase();
+            ContentValues contentValues = new ContentValues();
+            contentValues.put(ID_CAMINOS, id );
+            contentValues.put(OBRA_CAMINOS,obra);
+            contentValues.put(NOMBRE_CAMINOS,nombre);
+            contentValues.put(DESDE_CAMINOS,desde);
+            contentValues.put(HASTA_CAMINOS,hasta);
+
+            db.insert("caminos",null,contentValues);
+            db.close();
+            return true;
+        }catch (Exception e){
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+
+
     public boolean RegistroChoferes(String id,String nombre, String apellido ){
         try {
 
@@ -305,6 +377,27 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             e.printStackTrace();
         }
         return ChoferExiste;
+    }
+
+    public boolean ExisteCamino(String id){
+        boolean CaminoExiste = false;
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = db.rawQuery("SELECT nombre FROM caminos WHERE id = '"+id+"'",null);
+        try {
+
+            if (cursor.getCount()<=0){
+
+                CaminoExiste = false;
+            }else{
+
+                CaminoExiste = true;
+            }
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return CaminoExiste;
     }
 
 

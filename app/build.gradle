@@ -6,8 +6,8 @@ android {
         applicationId "cl.ingenieriasantafe.carcheque"
         minSdkVersion 15
         targetSdkVersion 28
-        versionCode 16
-        versionName "16"
+        versionCode 25
+        versionName "1.8.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {

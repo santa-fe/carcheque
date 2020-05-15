@@ -1,5 +1,6 @@
 package cl.ingenieriasantafe.carcheque;
 
+import android.app.ActionBar;
 import android.app.ProgressDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
@@ -40,6 +41,8 @@ public class MainActivity extends AppCompatActivity {
     public static final String APIUsuarios = "http://santafeinversiones.org/api/material-obra/cardchecker";
     public static final String APIVEHICULOS = "http://santafeinversiones.org/api/material-obra/camion";
     public static final String APICHOFERES = "http://santafeinversiones.org/api/material-obra/chofer";
+    public static final String APICAMINOS = "http://santafeinversiones.org/api/material-obra/caminos";
+    public static final String APIPLANTAS = "http://santafeinversiones.org/api/material-obra/plantas";
     private RequestQueue mRequestQueue;
     private StringRequest mStringRequest;
     DatabaseHelper myDB;
@@ -59,6 +62,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getSupportActionBar().hide();
         setContentView(R.layout.activity_main);
         login = (Button) findViewById(R.id.btnlogin);
         myDB = new DatabaseHelper(this);
@@ -74,6 +78,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void run() {
                 DescargaUsuarios();
+
             }
         }).start();
 
@@ -184,7 +189,7 @@ public class MainActivity extends AppCompatActivity {
                                     db.execSQL("DELETE FROM usuarios WHERE log_id='"+usuarios.log_id+"'");
                                 }
                                 else{
-                                    if (username != usuarios.nombre){
+                                    if (username != usuarios.username){
                                         db.execSQL("UPDATE usuarios SET username='"+usuarios.username.toLowerCase()+"' WHERE log_id='"+usuarios.log_id+"'");
                                     }
                                     if (nombre != usuarios.nombre){
@@ -344,6 +349,8 @@ public class MainActivity extends AppCompatActivity {
                 try{
                     DescargaChoferes();
                     DescargadePatentes();
+                    DescargadeCaminos();
+                    DescargaPlantas();
                     Thread.sleep(5000);
                     progressDialog.dismiss();
                     Intent intent = new Intent(MainActivity.this, FormularioRecepcion_Activity.class);
@@ -397,10 +404,7 @@ public class MainActivity extends AppCompatActivity {
                                 if (apellido != choferes.apellido){
                                     db.execSQL("UPDATE choferes SET apellido='"+choferes.apellido+"' WHERE id='"+choferes.id+"'");
                                 }
-
                             }
-
-
                         }
                     }
 
@@ -413,6 +417,139 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onErrorResponse(VolleyError error) {
                 Log.i("CONEXION API CHOFERES:",error.toString());
+            }
+        });
+        mStringRequest.setRetryPolicy(new DefaultRetryPolicy(
+                15000,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+        mRequestQueue.add(mStringRequest);
+    }
+
+
+    private void DescargadeCaminos(){
+        mRequestQueue = Volley.newRequestQueue(this);
+        mStringRequest = new StringRequest(Request.Method.GET, APICAMINOS, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                try {
+
+                    Log.i("CONEXION API CAMINOS: ",response.toString());
+                    String json;
+                    json = response.toString();
+                    JSONArray jsonArray = null;
+                    jsonArray = new JSONArray(json);
+                    Caminos caminos = new Caminos();
+
+                    for (int i = 0; i < jsonArray.length(); i++) {
+                        JSONObject jsonObject = jsonArray.getJSONObject(i);
+
+                        caminos.id = jsonObject.getString("id");
+                        caminos.obra = jsonObject.getString("obra");
+                        caminos.nombre = jsonObject.getString("nombre");
+                        caminos.desde = jsonObject.getString("desde");
+                        caminos.hasta = jsonObject.getString("hasta");
+
+                        SQLiteDatabase db = myDB.getWritableDatabase();
+
+                        if (myDB.ExisteCamino(caminos.id) == false){
+                            //EL CAMINO NO SE ENCUENTRA REGISTRADO
+                            myDB.RegistroCaminos(caminos.id,caminos.obra,caminos.nombre,caminos.desde,caminos.hasta);
+
+                        }else{
+                            Cursor cursor = db.rawQuery("SELECT obra,nombre,desde,hasta FROM caminos WHERE id ='"+caminos.id+"'",null);
+                            if (cursor.moveToFirst() == true){
+                                String obra = cursor.getString(0);
+                                String nombre = cursor.getString(1);
+                                String desde = cursor.getString(2);
+                                String hasta = cursor.getString(3);
+
+                                if (obra != caminos.obra){
+                                    db.execSQL("UPDATE caminos SET obra='"+caminos.obra+"' WHERE id='"+caminos.id+"'");
+                                }
+                                if (nombre != caminos.nombre){
+                                    db.execSQL("UPDATE caminos SET nombre='"+caminos.nombre+"' WHERE id='"+caminos.id+"'");
+                                }
+                                if (desde != caminos.desde){
+                                    db.execSQL("UPDATE caminos SET desde='"+caminos.desde+"' WHERE id='"+caminos.id+"'");
+                                }
+                                if (hasta != caminos.hasta){
+                                    db.execSQL("UPDATE caminos SET hasta='"+caminos.hasta+"' WHERE id='"+caminos.id+"'");
+                                }
+                            }
+                        }
+                    }
+
+                }catch (JSONException e){
+                    e.printStackTrace();
+                }
+
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.i("CONEXION API CAMINOS:",error.toString());
+            }
+        });
+        mStringRequest.setRetryPolicy(new DefaultRetryPolicy(
+                15000,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+        mRequestQueue.add(mStringRequest);
+    }
+
+
+    private void DescargaPlantas(){
+        mRequestQueue = Volley.newRequestQueue(this);
+        mStringRequest = new StringRequest(Request.Method.GET, APIPLANTAS, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                try {
+                    Log.i("CONEXION API PLANTAS: ",response.toString());
+                    String json;
+                    json = response.toString();
+                    JSONArray jsonArray = null;
+                    jsonArray = new JSONArray(json);
+                    Plantas plantas = new Plantas();
+
+                    for (int i = 0; i < jsonArray.length(); i++) {
+                        JSONObject jsonObject = jsonArray.getJSONObject(i);
+
+                        plantas.id = jsonObject.getString("id");
+                        plantas.obra = jsonObject.getString("obra");
+                        plantas.nombre = jsonObject.getString("planta");
+
+                        SQLiteDatabase db = myDB.getWritableDatabase();
+
+                        if (myDB.ExistePlanta(plantas.id) == false){
+                            //EL CAMINO NO SE ENCUENTRA REGISTRADO
+                            myDB.Registroplantas(plantas.id,plantas.nombre,plantas.obra);
+
+                        }else{
+                            Cursor cursor = db.rawQuery("SELECT nombre,obra FROM plantas WHERE id ='"+plantas.id+"'",null);
+                            if (cursor.moveToFirst() == true){
+                                String nombre = cursor.getString(0);
+                                String obra = cursor.getString(1);
+
+                                if (obra != plantas.obra){
+                                    db.execSQL("UPDATE plantas SET obra='"+plantas.obra+"' WHERE id='"+plantas.id+"'");
+                                }
+                                if (nombre != plantas.nombre) {
+                                    db.execSQL("UPDATE caminos SET nombre='" + plantas.nombre + "' WHERE id='" + plantas.id + "'");
+                                }
+                            }
+                        }
+                    }
+
+                }catch (JSONException e){
+                    e.printStackTrace();
+                }
+
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.i("CONEXION API PLANTAS:",error.toString());
             }
         });
         mStringRequest.setRetryPolicy(new DefaultRetryPolicy(

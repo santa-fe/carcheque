@@ -24,12 +24,16 @@ import android.support.v7.app.AppCompatActivity;
 import android.text.InputFilter;
 import android.util.Base64;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.SimpleCursorAdapter;
 import android.widget.Spinner;
 import android.widget.Toast;
 
@@ -87,7 +91,7 @@ public class FormularioRecepcion_Activity extends AppCompatActivity {
     public static final String APIEnvioRecepcion = "http://santafeinversiones.org/api/material-obra/registros";
     DatabaseHelper myDB = new DatabaseHelper(this);
     Spinner tipomaterial, plantaspinner, caminospinner;
-    private AutoCompleteTextView pt,nombrechofer;
+    private AutoCompleteTextView pt, nombrechofer;
     EditText m3, kilometraje;
     Button recepcion;
 
@@ -95,6 +99,7 @@ public class FormularioRecepcion_Activity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.formulariorecepcion_layout);
+        getSupportActionBar().show();
         caminospinner = (Spinner) findViewById(R.id.CaminoSpinner);
         tipomaterial = (Spinner) findViewById(R.id.tipomaterialSpinner);
         plantaspinner = (Spinner) findViewById(R.id.plantaSpinner);
@@ -103,7 +108,7 @@ public class FormularioRecepcion_Activity extends AppCompatActivity {
         pt = findViewById(R.id.patentesRecepcion);
         m3 = (EditText) findViewById(R.id.txtm3Recepcion);
         kilometraje = (EditText) findViewById(R.id.txtkilometroRecepcion);
-        nombrechofer =findViewById(R.id.Chofer_Recepcion);
+        nombrechofer = findViewById(R.id.Chofer_Recepcion);
 
         //ADAPTADORES DE SPINNER
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.materiales_string, android.R.layout.simple_spinner_item);
@@ -115,6 +120,10 @@ public class FormularioRecepcion_Activity extends AppCompatActivity {
         plantaspinner.setAdapter(adapter1);
 
 
+
+
+        cargacaminos();
+        cargaplantas();
         Cargapatentes();
         Cargachoferes();
         recepcion.setOnClickListener(new View.OnClickListener() {
@@ -125,72 +134,70 @@ public class FormularioRecepcion_Activity extends AppCompatActivity {
         });
 
 
-
-        Carga_caminos();
         SegundoPlano sp = new SegundoPlano();
         sp.execute();
 
     }
 
-
-    private void Carga_caminos() {
+    private void cargacaminos() {
+        //SPINNER CAMINOS
         SharedPreferences preferences = getSharedPreferences("credenciales", Context.MODE_PRIVATE);
         String obra = preferences.getString("UNEGOCIO", "NO EXISTE NINGUNA OBRA");
-
-        if (obra.equalsIgnoreCase("rincon de lobos")) {
-            caminosl11();
-            plantas_rincon_lobos();
-        } else if (obra.equalsIgnoreCase("talca norte")) {
-            caminostalcanorte();
-        } else if (obra.equalsIgnoreCase("pencahue")){
-            caminospencahue();
-            plantas_especifica_pencahue();
-        } else if(obra.equalsIgnoreCase("paredones")){
-            caminosparedones();
-            plantas_paredones();
+        ArrayList<String>caminos = new ArrayList<>();
+        caminos.add("SELECCIONE CAMINO");
+        SQLiteDatabase db = myDB.getReadableDatabase();
+        final Cursor c = db.rawQuery("SELECT nombre AS _id,nombre FROM caminos WHERE obra ='" + obra + "'", null);
+        c.moveToFirst();
+        while (!c.isAfterLast()){
+            caminos.add(c.getString(c.getColumnIndex("nombre")));
+            c.moveToNext();
         }
+        ArrayAdapter adaptercaminos = new ArrayAdapter<>(this,android.R.layout.simple_spinner_item,caminos);
+        adaptercaminos.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        caminospinner.setAdapter(adaptercaminos);
     }
 
-    private void caminosl11() {
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.caminos_l11_string, android.R.layout.simple_spinner_item);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        caminospinner.setAdapter(adapter);
-
-    }
-    private void caminostalcanorte() {
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.caminos_talcanorte, android.R.layout.simple_spinner_item);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        caminospinner.setAdapter(adapter);
-    }
-    private void caminospencahue(){
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.caminos_pencahue, android.R.layout.simple_spinner_item);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        caminospinner.setAdapter(adapter);
-    }
-
-    private void caminosparedones(){
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.caminos_paredones, android.R.layout.simple_spinner_item);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        caminospinner.setAdapter(adapter);
-    }
-    private void plantas_rincon_lobos(){
-        ArrayAdapter<CharSequence> adapter1 = ArrayAdapter.createFromResource(this, R.array.plantas_rincon_lobos, android.R.layout.simple_spinner_item);
-        adapter1.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        plantaspinner.setAdapter(adapter1);
+    private void cargaplantas() {
+        //SPINNER CAMINOS
+        SharedPreferences preferences = getSharedPreferences("credenciales", Context.MODE_PRIVATE);
+        String obra = preferences.getString("UNEGOCIO", "NO EXISTE NINGUNA OBRA");
+        ArrayList<String>plantas = new ArrayList<>();
+        plantas.add("SELECCIONE PLANTA");
+        SQLiteDatabase db = myDB.getReadableDatabase();
+        final Cursor c = db.rawQuery("SELECT nombre AS _id,nombre FROM plantas WHERE obra ='" + obra + "'", null);
+        c.moveToFirst();
+        while (!c.isAfterLast()){
+            plantas.add(c.getString(c.getColumnIndex("nombre")));
+            c.moveToNext();
+        }
+        ArrayAdapter adapterplantas = new ArrayAdapter<>(this,android.R.layout.simple_spinner_item,plantas);
+        adapterplantas.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        plantaspinner.setAdapter(adapterplantas);
     }
 
-    private void plantas_especifica_pencahue(){
-        ArrayAdapter<CharSequence> adapter1 = ArrayAdapter.createFromResource(this, R.array.plantas_especifica_pencahue, android.R.layout.simple_spinner_item);
-        adapter1.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        plantaspinner.setAdapter(adapter1);
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu, menu);
+        return super.onCreateOptionsMenu(menu);
     }
 
-    private void plantas_paredones(){
-        ArrayAdapter<CharSequence> adapter1 = ArrayAdapter.createFromResource(this, R.array.plantas_paredones, android.R.layout.simple_spinner_item);
-        adapter1.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        plantaspinner.setAdapter(adapter1);
-    }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_reimprimir:
+                Intent intent = new Intent(FormularioRecepcion_Activity.this, Reimprimir_Activity.class);
+                startActivity(intent);
+
+                return true;
+        }
+
+
+        return super.onOptionsItemSelected(item);
+    }
 
     private void Cargapatentes() {
         List<Vehiculos> patents = new ArrayList<Vehiculos>();
@@ -215,7 +222,6 @@ public class FormularioRecepcion_Activity extends AppCompatActivity {
     }
 
     private void recepcionmaterial() {
-
         int metroscubicos = Integer.parseInt(m3.getText().toString());
 
         if (pt.getText().toString().equals("") || m3.getText().toString().equals("") || kilometraje.getText().toString().equals("")
@@ -226,14 +232,12 @@ public class FormularioRecepcion_Activity extends AppCompatActivity {
             if (tipomaterial.getSelectedItem().toString().equalsIgnoreCase("seleccione material") || plantaspinner.getSelectedItem().toString().equalsIgnoreCase("seleccione planta")
                     || caminospinner.getSelectedItem().toString().equalsIgnoreCase("seleccione camino")) {
                 Toast.makeText(getApplicationContext(), "SELECCIONE VALORES VALIDOS", Toast.LENGTH_SHORT).show();
-            } else if(metroscubicos<=25) {
+            } else if (metroscubicos <= 25) {
+
                 SharedPreferences preferences = getSharedPreferences("credenciales", Context.MODE_PRIVATE);
                 String nombre = preferences.getString("NAME", "NO EXISTE CREDENCIAL");
                 String apellido = preferences.getString("LASTNAME", "NO EXISTE CREDENCIAL");
-
-                SharedPreferences preferences1 = getSharedPreferences("obra_app", Context.MODE_PRIVATE);
-                final String obra = preferences1.getString("obra", "Sin obra");
-
+                final String obra = preferences.getString("UNEGOCIO", "Sin obra");
 
                 final String username = nombre + " " + apellido;
 
@@ -243,11 +247,10 @@ public class FormularioRecepcion_Activity extends AppCompatActivity {
                 final String fecha = dateFormat.format(date);
                 final String hora = horaformat.format(date);
 
-               Boolean registro = myDB.RegistroRecepcion(plantaspinner.getSelectedItem().toString(), tipomaterial.getSelectedItem().toString(),
-                        pt.getText().toString().toUpperCase(), m3.getText().toString(), kilometraje.getText().toString(),
+                Boolean registro = myDB.RegistroRecepcion(plantaspinner.getSelectedItem().toString(), tipomaterial.getSelectedItem().toString(), pt.getText().toString().toUpperCase(), m3.getText().toString(), kilometraje.getText().toString(),
                         fecha, hora, username, nombrechofer.getText().toString().toUpperCase(), "PENDIENTE", obra, caminospinner.getSelectedItem().toString());
 
-                /**  if (registro == true) {
+                if (registro == true) {
                     progressDialog.setTitle("Guardando recepción");
                     progressDialog.setMessage("Espere un momento......");
                     progressDialog.setProgressStyle(progressDialog.STYLE_SPINNER);
@@ -255,7 +258,7 @@ public class FormularioRecepcion_Activity extends AppCompatActivity {
                     progressDialog.setMax(100);
                     progressDialog.show();
 
-                   new Thread(new Runnable() {
+                    new Thread(new Runnable() {
                         @Override
                         public void run() {
                             try {
@@ -339,22 +342,18 @@ public class FormularioRecepcion_Activity extends AppCompatActivity {
                                             " " + "\n" +
                                             " " + "\n";
                                     os.write(msg2.getBytes());
-
                                     mBluetoothSocket.close();
                                     Thread.sleep(3000);
                                     progressDialog.dismiss();
-
                                     runOnUiThread(new Runnable() {
                                         @Override
                                         public void run() {
                                             Toast.makeText(getApplicationContext(), "Recepcion generada correctamente", Toast.LENGTH_SHORT).show();
                                         }
                                     });
-
                                     Intent intent = new Intent(FormularioRecepcion_Activity.this, FormularioRecepcion_Activity.class);
                                     startActivity(intent);
                                     finish();
-
                                 }
                             } catch (Exception e) {
                                 e.printStackTrace();
@@ -362,21 +361,20 @@ public class FormularioRecepcion_Activity extends AppCompatActivity {
                         }
                     }).start();
                 }
-            }else{
+            } else {
                 Toast.makeText(this, "LOS M3 DEBEN SER INFERIOR A 25", Toast.LENGTH_SHORT).show();
-            }**/
             }
         }
     }
 
-    private void SendPostData(){
+    private void SendPostData() {
         SQLiteDatabase db = myDB.getReadableDatabase();
         final String estado = "PENDIENTE";
 
         listaregistrosrecepcion = new ArrayList<Registro_recepcion>();
         Cursor cursor = db.rawQuery("SELECT id, planta, tipomaterial, patente, m3, km ,fecha, hora, usuario,chofer,obra, camino FROM recepcion WHERE estado='" + estado + "' ORDER BY id ASC", null);
 
-        while(cursor.moveToNext()){
+        while (cursor.moveToNext()) {
             registro_recepcion = new Registro_recepcion();
             registro_recepcion.setId(cursor.getInt(0));
             registro_recepcion.setPlanta(cursor.getString(1));
@@ -394,9 +392,9 @@ public class FormularioRecepcion_Activity extends AppCompatActivity {
             listaregistrosrecepcion.add(registro_recepcion);
         }
 
-        Log.i("LISTA",""+listaregistrosrecepcion.size());
+        Log.i("LISTA", "" + listaregistrosrecepcion.size());
 
-        for(int i = 0; i<listaregistrosrecepcion.size(); i++){
+        for (int i = 0; i < listaregistrosrecepcion.size(); i++) {
 
             final int id = listaregistrosrecepcion.get(i).getId();
             final String planta = listaregistrosrecepcion.get(i).getPlanta().toString();
@@ -412,7 +410,7 @@ public class FormularioRecepcion_Activity extends AppCompatActivity {
             final String camino = listaregistrosrecepcion.get(i).getCamino().toString();
 
             listaregistrosrecepcion.remove(i);
-            Log.i("FINFOR", ""+listaregistrosrecepcion.size());
+            Log.i("FINFOR", "" + listaregistrosrecepcion.size());
 
             String nvale = String.valueOf(id);
 
@@ -438,18 +436,24 @@ public class FormularioRecepcion_Activity extends AppCompatActivity {
                     client.post(APIEnvioRecepcion, params, new AsyncHttpResponseHandler() {
                         @Override
                         public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
-                            if(statusCode == 200){
+                            if (statusCode == 200) {
                                 String response = new String(responseBody).toUpperCase();
-                                Log.i("REQUEST", ""+response);
+                                Log.i("REQUEST", "" + response);
                                 SQLiteDatabase db = myDB.getReadableDatabase();
-                                db.execSQL("UPDATE recepcion SET estado='ENVIADO' WHERE id='"+id+ "'");
-                                Log.i("UPDATE","CAMBIO DE ESTADO ID: "+id);
+                                db.execSQL("UPDATE recepcion SET estado='ENVIADO' WHERE id='" + id + "'");
+                                Log.i("UPDATE", "CAMBIO DE ESTADO ID: " + id);
                             }
                         }
+
                         @Override
                         public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
-                            String response = new String(responseBody).toUpperCase();
-                            Log.i("REQUEST FAIL",""+error.toString()+" AA "+response);
+                            try {
+
+                                String response = new String(responseBody).toUpperCase();
+                                Log.i("REQUEST FAIL", "" + error.toString() + " AA " + response);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
                         }
                     });
                 }
@@ -462,7 +466,7 @@ public class FormularioRecepcion_Activity extends AppCompatActivity {
         try {
             eliminardatos();
             SendPostData();
-            Thread.sleep(4000000);
+            Thread.sleep(300000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -487,25 +491,30 @@ public class FormularioRecepcion_Activity extends AppCompatActivity {
 
     private void eliminardatos() {
 
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+        Date date = new Date();
+        String fechaactual = dateFormat.format(date);
+
         SQLiteDatabase db = myDB.getWritableDatabase();
         String estado = "ENVIADO";
         listaregistrosrecepcion = new ArrayList<Registro_recepcion>();
 
-        Cursor cursor = db.rawQuery("SELECT id FROM recepcion WHERE estado='" + estado + "'", null);
+        Cursor cursor = db.rawQuery("SELECT id, fecha FROM recepcion WHERE estado='" + estado + "'", null);
 
         while (cursor.moveToNext()) {
-            registro_recepcion = new Registro_recepcion();
-            registro_recepcion.setId(cursor.getInt(0));
-            listaregistrosrecepcion.add(registro_recepcion);
+            String fecha = cursor.getString(1);
+            if (fechaactual.equals(fecha)) {
+            } else {
+                registro_recepcion = new Registro_recepcion();
+                registro_recepcion.setId(cursor.getInt(0));
+                listaregistrosrecepcion.add(registro_recepcion);
+            }
         }
         for (int i = 0; i < listaregistrosrecepcion.size(); i++) {
 
             db.execSQL("DELETE FROM recepcion WHERE id=" + listaregistrosrecepcion.get(i).getId() + "");
-            Log.i("ELIM","ELIMINADO"+ listaregistrosrecepcion.get(i));
+            Log.i("ELIM", "ELIMINADO" + listaregistrosrecepcion.get(i));
         }
 
-
     }
-
-
 }

@@ -10,6 +10,7 @@
         <item>TERRAPLEN 6"</item>
         <item>INTEGRAL</item>
         <item>ARCILLA</item>
+        <item>MAICILLO</item>
     </string-array>
 
     <string-array name="plantas_string">
@@ -29,6 +30,7 @@
      <string-array name="plantas_paredones">
          <item>SELECCIONE PLANTA</item>
          <item>LA CAPILLA</item>
+         <item>POZO PAREDONES</item>
      </string-array>
 
      <string-array name="plantas_rincon_lobos">
@@ -37,6 +39,7 @@
          <item>EL PEUMO</item>
          <item>LA BALSA</item>
          <item>GASTON YANEZ</item>
+         <item>BEKAL</item>
      </string-array>
 
      <string-array name="plantas_especifica_pencahue">
@@ -77,8 +80,10 @@
 
      <string-array name="caminos_paredones">
          <item>SELECCIONE CAMINO</item>
-         <item>RUTA I-510</item>
-         <item>RUTA I-528</item>
-         <item>RUTA I-540</item>
+         <item>RUTA I-526</item>
+         <item>RUTA I-620</item>
+         <item>RUTA I-494</item>
+         <item>RUTA I-216</item>
+         <item>RUTA I-516</item>
      </string-array>
 </resources>

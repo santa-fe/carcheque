@@ -36,7 +36,7 @@
         </receiver>
 
         <activity android:name=".MainActivity"
-            android:label="Recepcion material Santa Fe">
+            android:label="">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -48,11 +48,14 @@
         <activity android:name=".Ajustes"
             android:label="Ajustes de la app">
         </activity>
+        <activity android:name=".Reimprimir_Activity"
+            android:label="">
+        </activity>
         <activity android:name=".bluetooth_list"
             android:label="Bluetooth">
         </activity>
     <activity android:name=".FormularioRecepcion_Activity"
-        android:label="Recepcion de material">
+        android:label="">
     </activity>
         <activity android:name=".SeleccionObra_Activity"
             android:label="Seleccion de obra">
